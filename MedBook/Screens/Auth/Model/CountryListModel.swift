@@ -6,3 +6,12 @@
 //
 
 import Foundation
+
+struct CountryListModel: Codable {
+    let data: [String: CountryData]?
+}
+
+struct CountryData: Codable {
+    let country: String?
+    let region: String?
+}

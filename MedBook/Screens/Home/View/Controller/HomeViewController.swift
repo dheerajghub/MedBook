@@ -44,7 +44,29 @@ class HomeViewController: UIViewController {
         searchView.translatesAutoresizingMaskIntoConstraints = false
         searchView.forSearching = false
         searchView.actionButton.addTarget(self, action: #selector(goToSearch), for: .touchUpInside)
+        
+        
+        searchView.searchTextField.attributedPlaceholder = NSAttributedString(
+            string: "Search for books",
+            attributes: [NSAttributedString.Key.foregroundColor: UIColor.black]
+        )
+        
+        searchView.searchCoverView.layer.borderColor = UIColor.black.cgColor
+        
         return searchView
+    }()
+    
+    lazy var logoutButton: UIButton = {
+        let button = UIButton()
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.setTitle("Log out", for: .normal)
+        button.setTitleColor(.red, for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 15, weight: .semibold)
+        button.backgroundColor = .lightGray.withAlphaComponent(0.1)
+        button.tapFeedBack()
+        button.layer.cornerRadius = 20
+        button.addTarget(self, action: #selector(logoutButtonTapped), for: .touchUpInside)
+        return button
     }()
     
     // MARK: MAIN -
@@ -63,6 +85,7 @@ class HomeViewController: UIViewController {
         view.addSubview(appLabel)
         view.addSubview(headerLabel)
         view.addSubview(customSearchView)
+        view.addSubview(logoutButton)
     }
     
     func setUpConstraints(){
@@ -78,10 +101,16 @@ class HomeViewController: UIViewController {
             headerLabel.topAnchor.constraint(equalTo: appLabel.bottomAnchor, constant: 30),
             headerLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             
-            customSearchView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 30),
-            customSearchView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -30),
-            customSearchView.topAnchor.constraint(equalTo: headerLabel.bottomAnchor, constant: 20),
+            customSearchView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 40),
+            customSearchView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -40),
+            customSearchView.topAnchor.constraint(equalTo: headerLabel.bottomAnchor, constant: 50),
             customSearchView.heightAnchor.constraint(equalToConstant: 45),
+            
+            logoutButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            logoutButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
+            logoutButton.widthAnchor.constraint(equalToConstant: 100),
+            logoutButton.heightAnchor.constraint(equalToConstant: 40)
+            
         ])
     }
     
@@ -92,6 +121,18 @@ class HomeViewController: UIViewController {
         controller.modalPresentationStyle = .fullScreen
         controller.modalTransitionStyle = .crossDissolve
         self.present(controller, animated: true)
+    }
+    
+    @objc func logoutButtonTapped(){
+        showAlert("Alert", message: "Are you sure want to logout!", actionButtonName: "Logout", isDestructive: true) { success in
+            if success {
+                AuthViewModel().logoutUser()
+                let controller = MainViewController()
+                controller.modalTransitionStyle = .crossDissolve
+                controller.modalPresentationStyle = .fullScreen
+                self.present(controller, animated: true)
+            }
+        }
     }
 
 }

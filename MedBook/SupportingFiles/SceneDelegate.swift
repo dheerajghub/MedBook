@@ -16,8 +16,18 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         window = UIWindow(frame: UIScreen.main.bounds)
         window?.windowScene = windowScene
-        let VC = ViewController()
-        window?.rootViewController = VC
+        
+        var controller = UIViewController()
+        
+        let isUserLoggedIn = UserDefaults.standard.bool(forKey: AuthViewModel().isLoggedIn)
+        if isUserLoggedIn {
+            controller = HomeViewController()
+        } else {
+            controller = MainViewController()
+        }
+    
+        
+        window?.rootViewController = controller
         window?.makeKeyAndVisible()
     }
 

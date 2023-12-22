@@ -6,3 +6,8 @@
 //
 
 import Foundation
+
+class MyIPModel: Codable {
+    let country: String?
+    let countryCode: String?
+}

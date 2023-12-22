@@ -11,6 +11,8 @@ class LoginViewController: UIViewController {
 
     // MARK: PROPERTIES -
     
+    let viewModel = AuthViewModel()
+    
     lazy var backButton: UIButton = {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -42,7 +44,7 @@ class LoginViewController: UIViewController {
         return view
     }()
     
-    let emailTextField: UITextField = {
+    lazy var emailTextField: UITextField = {
         let textField = UITextField()
         textField.translatesAutoresizingMaskIntoConstraints = false
         
@@ -51,8 +53,11 @@ class LoginViewController: UIViewController {
             attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray]
         )
         
+        textField.autocorrectionType = .no
         textField.textColor = .black
         textField.tintColor = .black
+        
+        textField.addTarget(self, action: #selector(emailTextFieldDidChange(_:)), for: .editingChanged)
         return textField
     }()
     
@@ -65,7 +70,7 @@ class LoginViewController: UIViewController {
         return view
     }()
     
-    let passwordTextField: UITextField = {
+    lazy var passwordTextField: UITextField = {
         let textField = UITextField()
         textField.translatesAutoresizingMaskIntoConstraints = false
         
@@ -77,7 +82,31 @@ class LoginViewController: UIViewController {
         textField.textColor = .black
         textField.tintColor = .black
         textField.isSecureTextEntry = true
+        textField.addTarget(self, action: #selector(passwordTextFieldDidChange(_:)), for: .editingChanged)
         return textField
+    }()
+    
+    lazy var showButton: UIButton = {
+        let button = UIButton()
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.setImage(UIImage(systemName: "eye.slash.fill"), for: .normal)
+        button.tapFeedBack()
+        button.addTarget(self, action: #selector(showPasswordButton), for: .touchUpInside)
+        button.tintColor = .black
+        return button
+    }()
+    
+    lazy var loginButton: UIButton = {
+        let button = UIButton()
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.setTitle("Login", for: .normal)
+        button.setTitleColor(.white, for: .normal)
+        button.backgroundColor = .black
+        button.layer.cornerRadius = 30
+        button.addTarget(self, action: #selector(loginButtonTapped), for: .touchUpInside)
+        button.titleLabel?.font = .systemFont(ofSize: 15, weight: .semibold)
+        button.tapFeedBack()
+        return button
     }()
     
     // MARK: MAIN -
@@ -101,6 +130,9 @@ class LoginViewController: UIViewController {
         
         view.addSubview(passwordTextCoverView)
         passwordTextCoverView.addSubview(passwordTextField)
+        passwordTextCoverView.addSubview(showButton)
+        
+        view.addSubview(loginButton)
         
     }
     
@@ -131,14 +163,72 @@ class LoginViewController: UIViewController {
             
             passwordTextField.leadingAnchor.constraint(equalTo: passwordTextCoverView.leadingAnchor, constant: 15),
             passwordTextField.trailingAnchor.constraint(equalTo: passwordTextCoverView.trailingAnchor, constant: -15),
-            passwordTextField.centerYAnchor.constraint(equalTo: passwordTextCoverView.centerYAnchor)
+            passwordTextField.centerYAnchor.constraint(equalTo: passwordTextCoverView.centerYAnchor),
+            
+            showButton.trailingAnchor.constraint(equalTo: passwordTextCoverView.trailingAnchor, constant: -15),
+            showButton.centerYAnchor.constraint(equalTo: passwordTextCoverView.centerYAnchor),
+            showButton.widthAnchor.constraint(equalToConstant: 40),
+            showButton.heightAnchor.constraint(equalToConstant: 40),
+            
+            loginButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            loginButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            loginButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -10),
+            loginButton.heightAnchor.constraint(equalToConstant: 60)
         ])
     }
+    
     
     // MARK: ACTIONS -
     
     @objc func backButtonTapped(){
         self.dismiss(animated: true)
     }
+    
+    @objc func loginButtonTapped(){
+        
+        viewModel.loginUser { success, message in
+            if success {
+                self.showAlert("Success", message: message ?? "", actionButtonName: "Let's go") { _ in
+                    // redirect user to listing page
+                    let controller = HomeViewController()
+                    controller.modalTransitionStyle = .crossDissolve
+                    controller.modalPresentationStyle = .fullScreen
+                    self.present(controller, animated: true)
+                }
+            } else {
+                self.showAlert("Error", message: message ?? "") { _ in }
+            }
+        }
+        
+    }
+    
+    @objc func showPasswordButton(){
+        viewModel.showPassword = !viewModel.showPassword
+        
+        if viewModel.showPassword {
+            showButton.setImage(UIImage(systemName: "eye.fill"), for: .normal)
+            showButton.tintColor = .black
+            passwordTextField.isSecureTextEntry = false
+        } else {
+            showButton.setImage(UIImage(systemName: "eye.slash.fill"), for: .normal)
+            showButton.tintColor = .black
+            passwordTextField.isSecureTextEntry = true
+        }
+    }
+    
+    @objc func emailTextFieldDidChange(_ textField: UITextField) {
+        
+        let enteredText = textField.text ?? ""
+        viewModel.email = enteredText
+        
+    }
+    
+    @objc func passwordTextFieldDidChange(_ textField: UITextField) {
+        
+        let enteredText = textField.text ?? ""
+        viewModel.password = enteredText
+        
+    }
+
 
 }
