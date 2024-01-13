@@ -7,79 +7,91 @@
 
 import Foundation
 import KeychainSwift
+import RealmSwift
 
 
 class AuthViewModel {
     
     let httpUtility = HttpUtility()
     let keychain = KeychainSwift()
+    let realm = try! Realm()
     var countries: [String] = []
     
+    let isLoggedIn = "isLoggedIn"
+    
+    var name: String = ""
     var email: String = ""
     var password: String = ""
     var currentCountry: String = ""
     
     var showPassword = false
-
-    var LoggedInUserDataInKeychain = "loggedInUserData"
-    var isLoggedIn = "isUserLoggedIn"
     
     var validationOne = false
     var validationTwo = false
     var validationThree = false
     
-    func signupNewUser(_ completion: (Bool, String?) -> Void){
+    func signupNewUser(_ completion: @escaping (Bool, String?) -> Void){
         
-        guard !email.isEmpty, !password.isEmpty, !currentCountry.isEmpty else {
-            completion(false, "Missing Details!")
+        guard !name.isEmpty, !email.isEmpty, !password.isEmpty, !currentCountry.isEmpty else {
+            DispatchQueue.main.async {
+                completion(false, "Missing Details!")
+            }
             return
         }
         
-        let userModel = UserModel(email: self.email, password: self.password, countryName: self.currentCountry)
+        // check whether user with same email exist if so, return message
+        if isUserAlreadyExist(withEmail: email) {
+            DispatchQueue.main.async {
+                completion(false, "User already exist with this email \(self.email)")
+            }
+            return
+        }
+        
+        let user = UserRealmModel(name: name, email: email, currentCountry: currentCountry, password: password)
         
         do {
-            let userObjectData = try JSONEncoder().encode(userModel)
-            keychain.set(userObjectData, forKey: LoggedInUserDataInKeychain)
-            completion(true, "Signup successfully!")
-            
-            UserDefaults.standard.set(true, forKey: isLoggedIn)
-            
+            try! realm.write {
+                realm.add(user)
+                UserDefaults.standard.set(true, forKey: "isLoggedIn")
+                DispatchQueue.main.async {
+                    completion(true, "Sign up successfully!")
+                }
+            }
         } catch {
-            completion(false, "Unable to create user account!")
+            DispatchQueue.main.async {
+                completion(false, "Unable to create user account!")
+            }
             return
         }
         
     }
     
     
-    func loginUser(_ completion: (Bool, String?) -> Void){
+    func loginUser(_ completion: @escaping (Bool, String?) -> Void){
         
         guard !email.isEmpty, !password.isEmpty else {
-            completion(false, "Missing Details!")
-            return
-        }
-        
-        guard let userObjectData = keychain.getData(LoggedInUserDataInKeychain) else {
-            completion(false, "email or password invalid!")
-            return
-        }
-        
-        do {
-            
-            let userData = try JSONDecoder().decode(UserModel.self, from: userObjectData)
-            
-            if self.email == userData.email ?? "" && self.password == userData.password {
-                completion(true, "LoggedIn successfully!")
-                UserDefaults.standard.set(true, forKey: isLoggedIn)
-            } else {
-                completion(false, "email or password invalid!")
+            DispatchQueue.main.async {
+                completion(false, "Missing Details!")
             }
-            
-        } catch {
-            completion(false, "Unable to create user account!")
             return
         }
         
+        let users = realm.objects(UserRealmModel.self)
+        
+        let user = users.where { user in
+            return user.email == email.lowercased() && user.password == password
+        }
+        
+        if user.count > 0 {
+            UserDefaults.standard.set(true, forKey: "isLoggedIn")
+            DispatchQueue.main.async {
+                completion(true, "Logged In Successfully!")
+            }
+        } else {
+            DispatchQueue.main.async {
+                completion(false, "Email or Password Invalid!")
+            }
+        }
         
     }
     
@@ -88,8 +100,6 @@ class AuthViewModel {
     }
     
     func logoutAndDeleteUser(){
-        keychain.delete(LoggedInUserDataInKeychain)
-        keychain.clear()
         UserDefaults.standard.set(false, forKey: isLoggedIn)
     }
     
@@ -152,6 +162,20 @@ class AuthViewModel {
         self.countries = countries.sorted { countryA, countryB in
             countryA < countryB
         }
+    }
+    
+    // MARK: - REALM FUNCTIONS
+    
+    func isUserAlreadyExist(withEmail: String) -> Bool {
+        
+        let users = realm.objects(UserRealmModel.self)
+        
+        let user = users.where {
+            $0.email == withEmail
+        }
+        
+        return user.count > 0 ? true : false
+        
     }
     
 }

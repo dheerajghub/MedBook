@@ -45,6 +45,33 @@ class SignupViewController: UIViewController {
         return label
     }()
     
+    let nameTextCoverView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.layer.cornerRadius = 10
+        view.backgroundColor = .lightGray.withAlphaComponent(0.1)
+        return view
+    }()
+    
+    lazy var nameTextField: UITextField = {
+        let textField = UITextField()
+        textField.translatesAutoresizingMaskIntoConstraints = false
+        
+        textField.attributedPlaceholder = NSAttributedString(
+            string: "Name",
+            attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray]
+        )
+        textField.autocorrectionType = .no
+        textField.textColor = .black
+        textField.tintColor = .black
+        textField.autocapitalizationType = .none
+        
+        textField.addTarget(self, action: #selector(nameTextFieldDidChange(_:)), for: .editingChanged)
+        
+        return textField
+    }()
+    
+    
     let emailTextCoverView: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
@@ -64,6 +91,7 @@ class SignupViewController: UIViewController {
         textField.autocorrectionType = .no
         textField.textColor = .black
         textField.tintColor = .black
+        textField.autocapitalizationType = .none
         
         textField.addTarget(self, action: #selector(emailTextFieldDidChange(_:)), for: .editingChanged)
         
@@ -193,6 +221,9 @@ class SignupViewController: UIViewController {
         view.addSubview(backButton)
         view.addSubview(headerLabel)
         
+        view.addSubview(nameTextCoverView)
+        nameTextCoverView.addSubview(nameTextField)
+        
         view.addSubview(emailTextCoverView)
         emailTextCoverView.addSubview(emailTextField)
         
@@ -219,15 +250,25 @@ class SignupViewController: UIViewController {
             headerLabel.topAnchor.constraint(equalTo: backButton.bottomAnchor, constant: 30),
             headerLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             
+            nameTextCoverView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            nameTextCoverView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            nameTextCoverView.topAnchor.constraint(equalTo: headerLabel.bottomAnchor, constant: 50),
+            nameTextCoverView.heightAnchor.constraint(equalToConstant: 60),
+            
+            nameTextField.leadingAnchor.constraint(equalTo: nameTextCoverView.leadingAnchor, constant: 15),
+            nameTextField.trailingAnchor.constraint(equalTo: nameTextCoverView.trailingAnchor, constant: -15),
+            nameTextField.centerYAnchor.constraint(equalTo: nameTextCoverView.centerYAnchor),
+            nameTextField.heightAnchor.constraint(equalToConstant: 50),
+            
             emailTextCoverView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             emailTextCoverView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            emailTextCoverView.topAnchor.constraint(equalTo: headerLabel.bottomAnchor, constant: 50),
+            emailTextCoverView.topAnchor.constraint(equalTo: nameTextCoverView.bottomAnchor, constant: 15),
             emailTextCoverView.heightAnchor.constraint(equalToConstant: 60),
             
             emailTextField.leadingAnchor.constraint(equalTo: emailTextCoverView.leadingAnchor, constant: 15),
             emailTextField.trailingAnchor.constraint(equalTo: emailTextCoverView.trailingAnchor, constant: -15),
             emailTextField.centerYAnchor.constraint(equalTo: emailTextCoverView.centerYAnchor),
-            
+            emailTextField.heightAnchor.constraint(equalToConstant: 50),
             
             passwordTextCoverView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             passwordTextCoverView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
@@ -237,12 +278,12 @@ class SignupViewController: UIViewController {
             passwordTextField.leadingAnchor.constraint(equalTo: passwordTextCoverView.leadingAnchor, constant: 15),
             passwordTextField.trailingAnchor.constraint(equalTo: showButton.leadingAnchor, constant: -5),
             passwordTextField.centerYAnchor.constraint(equalTo: passwordTextCoverView.centerYAnchor),
+            passwordTextField.heightAnchor.constraint(equalToConstant: 50),
             
             showButton.trailingAnchor.constraint(equalTo: passwordTextCoverView.trailingAnchor, constant: -15),
             showButton.centerYAnchor.constraint(equalTo: passwordTextCoverView.centerYAnchor),
             showButton.widthAnchor.constraint(equalToConstant: 40),
             showButton.heightAnchor.constraint(equalToConstant: 40),
-            
             
             validatePointStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             validatePointStackView.topAnchor.constraint(equalTo: passwordTextCoverView.bottomAnchor, constant: 20),
@@ -251,7 +292,6 @@ class SignupViewController: UIViewController {
             validationOne.heightAnchor.constraint(equalToConstant: 40),
             validationTwo.heightAnchor.constraint(equalToConstant: 40),
             validationThree.heightAnchor.constraint(equalToConstant: 40),
-            
             
             countryPicker.bottomAnchor.constraint(equalTo: signupButton.topAnchor, constant: -10),
             countryPicker.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
@@ -267,7 +307,7 @@ class SignupViewController: UIViewController {
     
     func actionButtonUpdates() {
         
-        if viewModel.validationOne && viewModel.validationTwo && viewModel.validationThree && !viewModel.email.isEmpty {
+        if viewModel.validationOne && viewModel.validationTwo && viewModel.validationThree && !viewModel.email.isEmpty && !viewModel.name.isEmpty {
             signupButton.isEnabled = true
             signupButton.alpha = 1
         } else {
@@ -313,6 +353,14 @@ class SignupViewController: UIViewController {
             showButton.tintColor = .black
             passwordTextField.isSecureTextEntry = true
         }
+    }
+    
+    @objc func nameTextFieldDidChange(_ textField: UITextField) {
+        
+        let enteredText = textField.text ?? ""
+        viewModel.name = enteredText
+        actionButtonUpdates()
+        
     }
     
     @objc func emailTextFieldDidChange(_ textField: UITextField) {

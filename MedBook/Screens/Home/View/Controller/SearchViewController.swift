@@ -166,14 +166,29 @@ class SearchViewController: UIViewController {
         ])
     }
     
+    func startBottomLoader(){
+        let footerView = SearchFooterView(frame: CGRect(x: 0, y: 0, width: self.searchItemsTableView.frame.width, height: 100))
+        footerView.activityIndicator.startAnimating()
+        searchItemsTableView.tableFooterView = footerView
+    }
+    
+    func stopBottomLoader(){
+        let footerView = UIView()
+        searchItemsTableView.tableFooterView = footerView
+    }
+    
     func loadSearchResults(searchText: String){
         
-        loaderView.isHidden = false
+        if viewModel.searchedItems.isEmpty {
+            loaderView.isHidden = false
+        }
         viewModel.searchTimer?.invalidate()
         
         // if not for pagination clear the search item array
         if viewModel.offset == 0 {
             viewModel.searchedItems.removeAll()
+        } else {
+            startBottomLoader()
         }
         
         // adding debouncing for smooth quering
@@ -185,6 +200,7 @@ class SearchViewController: UIViewController {
                 // Use search text and perform the query
                 viewModel.searchForBook(with: searchText) { success, error in
                     self.loaderView.isHidden = true
+                    self.stopBottomLoader()
                     self.searchItemsTableView.reloadData()
                 }
                 

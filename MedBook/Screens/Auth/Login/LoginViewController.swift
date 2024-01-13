@@ -56,6 +56,7 @@ class LoginViewController: UIViewController {
         textField.autocorrectionType = .no
         textField.textColor = .black
         textField.tintColor = .black
+        textField.autocapitalizationType = .none
         
         textField.addTarget(self, action: #selector(emailTextFieldDidChange(_:)), for: .editingChanged)
         return textField
