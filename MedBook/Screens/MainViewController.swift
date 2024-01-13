@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import KeychainSwift
 
 class MainViewController: UIViewController {
 
@@ -70,10 +69,6 @@ class MainViewController: UIViewController {
         super.viewDidLoad()
         setUpViews()
         setUpConstraints()
-        
-        let keychain = KeychainSwift()
-        print(keychain.allKeys)
-        
     }
     
     // MARK: FUNCTIONS -

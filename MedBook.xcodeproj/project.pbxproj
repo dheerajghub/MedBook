@@ -38,7 +38,6 @@
 		44FED41F2B3491190015F4A8 /* SignupViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44FED41E2B3491190015F4A8 /* SignupViewController.swift */; };
 		44FED4212B34947B0015F4A8 /* MyIPModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44FED4202B34947B0015F4A8 /* MyIPModel.swift */; };
 		44FED4232B34A1C40015F4A8 /* ValidationCheckPointView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44FED4222B34A1C40015F4A8 /* ValidationCheckPointView.swift */; };
-		44FED4272B34B36C0015F4A8 /* KeychainSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 44FED4262B34B36C0015F4A8 /* KeychainSwift */; };
 		44FED4292B3516500015F4A8 /* UserModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44FED4282B3516500015F4A8 /* UserModel.swift */; };
 /* End PBXBuildFile section */
 
@@ -83,7 +82,6 @@
 			files = (
 				449696412B521BC3007B2E5B /* RealmSwift in Frameworks */,
 				4496963F2B521BC3007B2E5B /* Realm in Frameworks */,
-				44FED4272B34B36C0015F4A8 /* KeychainSwift in Frameworks */,
 				44DA513B2B33CEED00665273 /* Kingfisher in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -322,7 +320,6 @@
 			name = MedBook;
 			packageProductDependencies = (
 				44DA513A2B33CEED00665273 /* Kingfisher */,
-				44FED4262B34B36C0015F4A8 /* KeychainSwift */,
 				4496963E2B521BC3007B2E5B /* Realm */,
 				449696402B521BC3007B2E5B /* RealmSwift */,
 			);
@@ -356,7 +353,6 @@
 			mainGroup = 441A63D92B33242800F24DA8;
 			packageReferences = (
 				44DA51392B33CEED00665273 /* XCRemoteSwiftPackageReference "Kingfisher" */,
-				44FED4252B34B36C0015F4A8 /* XCRemoteSwiftPackageReference "keychain-swift" */,
 				4496963D2B521BC3007B2E5B /* XCRemoteSwiftPackageReference "realm-swift" */,
 			);
 			productRefGroup = 441A63E32B33242800F24DA8 /* Products */;
@@ -648,14 +644,6 @@
 				minimumVersion = 7.10.1;
 			};
 		};
-		44FED4252B34B36C0015F4A8 /* XCRemoteSwiftPackageReference "keychain-swift" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/evgenyneu/keychain-swift";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 20.0.0;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -673,11 +661,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 44DA51392B33CEED00665273 /* XCRemoteSwiftPackageReference "Kingfisher" */;
 			productName = Kingfisher;
-		};
-		44FED4262B34B36C0015F4A8 /* KeychainSwift */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 44FED4252B34B36C0015F4A8 /* XCRemoteSwiftPackageReference "keychain-swift" */;
-			productName = KeychainSwift;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

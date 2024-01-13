@@ -6,14 +6,12 @@
 //
 
 import Foundation
-import KeychainSwift
 import RealmSwift
 
 
 class AuthViewModel {
     
     let httpUtility = HttpUtility()
-    let keychain = KeychainSwift()
     let realm = try! Realm()
     var countries: [String] = []
     
